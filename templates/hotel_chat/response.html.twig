@@ -1,0 +1,21 @@
+<div class="hotel-chat__message hotel-chat__message--user">
+    {{ message }}
+</div>
+
+<div class="hotel-chat__message hotel-chat__message--assistant">
+    <strong>Structured search</strong>
+
+    <dl>
+        <dt>Destination</dt>
+        <dd>{{ search.destination }}</dd>
+
+        <dt>Adults</dt>
+        <dd>{{ search.adults }}</dd>
+
+        <dt>Rooms</dt>
+        <dd>{{ search.rooms }}</dd>
+
+        <dt>Amenities</dt>
+        <dd>{{ search.amenities|join(', ') }}</dd>
+    </dl>
+</div>

@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-class HotelSearchRequest
+class HotelSearch
 {
     public function __construct(
         public ?string $destination = null,

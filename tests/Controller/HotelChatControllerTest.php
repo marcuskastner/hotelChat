@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\WebTestCase;
 
 class HotelChatControllerTest extends WebTestCase
 {

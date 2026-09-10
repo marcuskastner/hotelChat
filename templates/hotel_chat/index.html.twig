@@ -1,16 +1,27 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="hotel-chat">
+    <div
+        class="hotel-chat"
+        data-controller="hotel-chat"
+    >
         <h1>Hotel Search</h1>
 
-        <div class="hotel-chat__messages">
+        <div
+            class="hotel-chat__messages"
+            data-hotel-chat-target="messages"
+        >
             <div class="hotel-chat__message hotel-chat__message--assistant">
                 What kind of hotel are you looking for?
             </div>
         </div>
 
-        <form method="post" class="hotel-chat__form">
+        <form
+            action="{{ path('hotel_chat_search') }}"
+            method="post"
+            data-hotel-chat-target="form"
+            data-action="submit->hotel-chat#submit"
+        >
             <label for="hotel-chat-message">
                 Search
             </label>
@@ -19,10 +30,14 @@
                 id="hotel-chat-message"
                 name="message"
                 type="text"
+                data-hotel-chat-target="input"
                 placeholder="e.g. hotels in San Diego with a pool"
             >
 
-            <button type="submit">
+            <button
+                type="submit"
+                data-hotel-chat-target="submit"
+            >
                 Search
             </button>
         </form>
