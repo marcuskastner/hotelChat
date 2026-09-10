@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="hotel-chat">
+        <h1>Hotel Search</h1>
+
+        <div class="hotel-chat__messages">
+            <div class="hotel-chat__message hotel-chat__message--assistant">
+                What kind of hotel are you looking for?
+            </div>
+        </div>
+
+        <form method="post" class="hotel-chat__form">
+            <label for="hotel-chat-message">
+                Search
+            </label>
+
+            <input
+                id="hotel-chat-message"
+                name="message"
+                type="text"
+                placeholder="e.g. hotels in San Diego with a pool"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+        </form>
+    </div>
+{% endblock %}
