@@ -5,6 +5,11 @@ export default class extends Controller {
 
     async submit(event) {
         event.preventDefault();
+        event.stopPropagation();
+
+        if (this.submitTarget.disabled) {
+            return;
+        }
 
         const formData = new FormData(this.formTarget);
 

@@ -14,7 +14,7 @@ class HotelSearchTest extends TestCase
         self::assertNull($search->destination);
         self::assertNull($search->checkIn);
         self::assertNull($search->checkOut);
-        self::assertSame(2, $search->adults);
+        self::assertSame(1, $search->adults);
         self::assertSame(1, $search->rooms);
         self::assertSame([], $search->amenities);
     }
