@@ -9,13 +9,13 @@ class HotelSearchMapper
     public function map(array $data): HotelSearch
     {
         return new HotelSearch(
-            destination: $data['destination'],
-            checkIn: $data['checkIn'],
-            checkOut: $data['checkOut'],
-            adults: $data['adults'],
-            children: $data['children'],
-            rooms: $data['rooms'],
-            amenities: $data['amenities'],
+            destination: $data['destination'] ?? null,
+            checkIn: $data['checkIn'] ?? null,
+            checkOut: $data['checkOut'] ?? null,
+            adults: $data['adults'] ?? 1,
+            children: $data['children'] ?? 0,
+            rooms: $data['rooms'] ?? 1,
+            amenities: $data['amenities'] ?? [],
         );
     }
 }

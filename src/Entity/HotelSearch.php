@@ -17,15 +17,15 @@ class HotelSearch
         public ?string $checkOut = null,
 
         #[Assert\Positive]
-        public ?int $adults = 1,
+        public int $adults = 1,
 
         #[Assert\PositiveOrZero]
-        public ?int $children = 0,
+        public int $children = 0,
 
         #[Assert\Positive]
-        public ?int $rooms = 1,
+        public int $rooms = 1,
 
-        public ?array $amenities = [],
+        public array $amenities = [],
     ) {
     }
 }
