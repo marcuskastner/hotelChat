@@ -13,6 +13,7 @@ class HotelSearchMapper
             checkIn: $data['checkIn'],
             checkOut: $data['checkOut'],
             adults: $data['adults'],
+            children: $data['children'],
             rooms: $data['rooms'],
             amenities: $data['amenities'],
         );
