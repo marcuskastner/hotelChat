@@ -11,10 +11,12 @@ class HotelSearchTest extends TestCase
     {
         $search = new HotelSearch();
 
-        self::assertNull($search->destination);
+        self::assertNull($search->city);
+        self::assertNull($search->state);
         self::assertNull($search->checkIn);
         self::assertNull($search->checkOut);
         self::assertSame(1, $search->adults);
+        self::assertSame(0, $search->children);
         self::assertSame(1, $search->rooms);
         self::assertSame([], $search->amenities);
     }
@@ -22,7 +24,8 @@ class HotelSearchTest extends TestCase
     public function testCanCreateSearch(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -30,7 +33,8 @@ class HotelSearchTest extends TestCase
             amenities: ['pool'],
         );
 
-        self::assertSame('San Diego', $search->destination);
+        self::assertSame('San Diego', $search->city);
+        self::assertSame('CA', $search->state);
         self::assertSame('2026-09-15', $search->checkIn);
         self::assertSame('2026-09-17', $search->checkOut);
         self::assertSame(2, $search->adults);

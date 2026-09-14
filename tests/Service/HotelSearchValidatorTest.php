@@ -22,7 +22,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testValidSearch(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -39,7 +40,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testDestinationIsRequired(): void
     {
         $search = new HotelSearch(
-            destination: null,
+            city: null,
+            state: null,
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -54,7 +56,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testDestinationCannotBeBlank(): void
     {
         $search = new HotelSearch(
-            destination: '',
+            city: '',
+            state: '',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -69,7 +72,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testAdultsMustBePositive(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 0,
@@ -84,7 +88,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testNegativeAdultsAreInvalid(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: -1,
@@ -99,7 +104,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testRoomsMustBePositive(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -114,7 +120,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testNegativeRoomsAreInvalid(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -126,25 +133,27 @@ class HotelSearchValidatorTest extends KernelTestCase
         $this->validator->validate($search);
     }
 
-    public function testCheckInDateCanBeNull(): void
+    public function testCheckInDateCannotBeNull(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: null,
             checkOut: null,
             adults: 2,
             rooms: 1,
         );
 
-        $this->validator->validate($search);
+        $this->expectException(InvalidArgumentException::class);
 
-        self::assertTrue(true);
+        $this->validator->validate($search);
     }
 
     public function testCheckInDateMustBeValid(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: 'not-a-date',
             checkOut: '2026-09-17',
             adults: 2,
@@ -159,7 +168,8 @@ class HotelSearchValidatorTest extends KernelTestCase
     public function testCheckOutDateMustBeValid(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: 'not-a-date',
             adults: 2,
@@ -171,24 +181,26 @@ class HotelSearchValidatorTest extends KernelTestCase
         $this->validator->validate($search);
     }
 
-    public function testValidSearchWithoutDates(): void
+    public function testInvalidSearchWithoutDates(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             adults: 2,
             rooms: 1,
             amenities: ['pool', 'wifi'],
         );
 
-        $this->validator->validate($search);
+        $this->expectException(InvalidArgumentException::class);
 
-        self::assertTrue(true);
+        $this->validator->validate($search);
     }
 
     public function testValidSearchWithMultipleAmenities(): void
     {
         $search = new HotelSearch(
-            destination: 'San Diego',
+            city: 'San Diego',
+            state: 'CA',
             checkIn: '2026-09-15',
             checkOut: '2026-09-17',
             adults: 2,
@@ -197,7 +209,6 @@ class HotelSearchValidatorTest extends KernelTestCase
                 'pool',
                 'wifi',
                 'gym',
-                'parking',
             ],
         );
 

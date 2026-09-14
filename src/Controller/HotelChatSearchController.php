@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Action\HotelChatSearchAction;
 use App\Service\HotelSearchParser;
 use App\Service\HotelSearchValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,8 +15,7 @@ class HotelChatSearchController extends AbstractController
     #[Route('/hotel/chat/search', name: 'hotel_chat_search', methods: ['POST'])]
     public function search(
         Request $request,
-        HotelSearchParser $parser,
-        HotelSearchValidator $validator
+        HotelChatSearchAction $action
     ): Response {
         try {
             $message = $request->request->get('message');
@@ -24,8 +24,8 @@ class HotelChatSearchController extends AbstractController
                 throw new \InvalidArgumentException('Message is required');
             }
 
-            $search = $parser->parse($message);
-            $validator->validate($search);
+            $search = $action->execute($message);
+
         } catch (\Throwable $e) {
             return $this->render('hotel_chat/alert.html.twig', [
                 'alert' => $e->getMessage(),
