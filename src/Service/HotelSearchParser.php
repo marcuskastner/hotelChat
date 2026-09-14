@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\HotelSearch;
 use App\Mapper\HotelSearchMapper;
 
-readonly class HotelSearchParser
+class HotelSearchParser
 {
     public function __construct(
         private OpenAiService $openAI,

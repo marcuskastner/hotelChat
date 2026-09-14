@@ -3,10 +3,14 @@
 namespace App\Tests\Action;
 
 use App\Action\HotelChatSearchAction;
+use App\Service\ContentServiceClient;
+use App\Service\CoordinatePolygonService;
 use InvalidArgumentException;
 use Symfony\AI\Agent\AgentInterface;
 use Symfony\AI\Agent\MockAgent;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 
 class HotelChatSearchActionTest extends KernelTestCase
 {
@@ -23,8 +27,10 @@ class HotelChatSearchActionTest extends KernelTestCase
             'rooms' => 1,
             'amenities' => [],
         ]);
+        $contentResponse = new JsonMockResponse(['properties' => []]);
+        $httpClient = new MockHttpClient($contentResponse);
 
-        $search = $this->action($agent)->execute($message);
+        $search = $this->action($agent, $httpClient)->execute($message);
 
         self::assertSame('Portland', $search->city);
         self::assertSame('OR', $search->state);
@@ -34,6 +40,13 @@ class HotelChatSearchActionTest extends KernelTestCase
         self::assertSame(-122.6762071, $search->longitude);
         $agent->assertCalledWith($message);
         $agent->assertCallCount(1);
+        self::assertSame(1, $httpClient->getRequestsCount());
+        self::assertSame('POST', $contentResponse->getRequestMethod());
+        self::assertSame('http://localhost:8000/hotel/expedia/geography', $contentResponse->getRequestUrl());
+        self::assertEquals(
+            (new CoordinatePolygonService())->generate($search),
+            json_decode($contentResponse->getRequestOptions()['body'], true, flags: \JSON_THROW_ON_ERROR),
+        );
     }
 
     public function testExecuteRejectsInvalidSearch(): void
@@ -49,10 +62,11 @@ class HotelChatSearchActionTest extends KernelTestCase
             'rooms' => 1,
             'amenities' => [],
         ]);
+        $httpClient = $this->unusedHttpClient();
 
         $this->expectException(InvalidArgumentException::class);
 
-        $this->action($agent)->execute($message);
+        $this->action($agent, $httpClient)->execute($message);
     }
 
     public function testExecuteRejectsUnknownCity(): void
@@ -68,11 +82,12 @@ class HotelChatSearchActionTest extends KernelTestCase
             'rooms' => 1,
             'amenities' => [],
         ]);
+        $httpClient = $this->unusedHttpClient();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Location not found for city: Nowhere, state: OR');
 
-        $this->action($agent)->execute($message);
+        $this->action($agent, $httpClient)->execute($message);
     }
 
     /**
@@ -85,10 +100,21 @@ class HotelChatSearchActionTest extends KernelTestCase
         ]);
     }
 
-    private function action(MockAgent $agent): HotelChatSearchAction
+    private function unusedHttpClient(): MockHttpClient
+    {
+        return new MockHttpClient(function (): never {
+            $this->fail('Content service should not have been called.');
+        });
+    }
+
+    private function action(MockAgent $agent, MockHttpClient $httpClient): HotelChatSearchAction
     {
         self::bootKernel();
         static::getContainer()->set(AgentInterface::class, $agent);
+        static::getContainer()->set(
+            ContentServiceClient::class,
+            new ContentServiceClient($httpClient, 'http://localhost:8000'),
+        );
 
         return static::getContainer()->get(HotelChatSearchAction::class);
     }
