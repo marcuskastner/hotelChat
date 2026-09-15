@@ -18,7 +18,7 @@ class ContentServiceClient
     }
 
 
-    public function getExpediaProperties(array $data = []): array
+    public function getExpediaPropertyIds(array $data = []): array
     {
         $response = $this->client->request(
             'POST',

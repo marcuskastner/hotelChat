@@ -10,7 +10,7 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 
 class ContentServiceClientTest extends TestCase
 {
-    public function testGetExpediaPropertiesPostsGeographyPayload(): void
+    public function testGetExpediaPropertyIdsPostsGeographyPayload(): void
     {
         $response = new JsonMockResponse(['properties' => [['id' => 'exp-1']]]);
         $client = new ContentServiceClient(
@@ -25,7 +25,7 @@ class ContentServiceClientTest extends TestCase
             ]],
         ];
 
-        $result = $client->getExpediaProperties($payload);
+        $result = $client->getExpediaPropertyIds($payload);
 
         self::assertSame(['properties' => [['id' => 'exp-1']]], $result);
         self::assertSame('POST', $response->getRequestMethod());
@@ -36,7 +36,7 @@ class ContentServiceClientTest extends TestCase
         );
     }
 
-    public function testGetExpediaPropertiesDefaultsToEmptyPayload(): void
+    public function testGetExpediaPropertyIdsDefaultsToEmptyPayload(): void
     {
         $response = new JsonMockResponse([]);
         $client = new ContentServiceClient(
@@ -44,14 +44,14 @@ class ContentServiceClientTest extends TestCase
             'http://localhost:8000',
         );
 
-        self::assertSame([], $client->getExpediaProperties());
+        self::assertSame([], $client->getExpediaPropertyIds());
         self::assertSame(
             [],
             json_decode($response->getRequestOptions()['body'], true, flags: \JSON_THROW_ON_ERROR),
         );
     }
 
-    public function testGetExpediaPropertiesThrowsOnServerError(): void
+    public function testGetExpediaPropertyIdsThrowsOnServerError(): void
     {
         $client = new ContentServiceClient(
             new MockHttpClient(new JsonMockResponse(['error' => 'unavailable'], ['http_code' => 500])),
@@ -60,6 +60,6 @@ class ContentServiceClientTest extends TestCase
 
         $this->expectException(ServerExceptionInterface::class);
 
-        $client->getExpediaProperties(['coordinates' => []]);
+        $client->getExpediaPropertyIds(['coordinates' => []]);
     }
 }
