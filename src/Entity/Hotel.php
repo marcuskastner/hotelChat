@@ -25,7 +25,7 @@ class Hotel
      *
      * Example:
      * [
-     *     'pool',
+     *     'swimming_pool',
      *     'wifi',
      *     'free_breakfast',
      *     'parking',
@@ -202,6 +202,13 @@ class Hotel
     public function setDistance(?float $distance): self
     {
         $this->distance = $distance;
+
+        return $this;
+    }
+
+    public function setDistanceFrom(HotelSearch $search): self
+    {
+        $this->distance = $search->distanceInMiles($this->latitude, $this->longitude);
 
         return $this;
     }

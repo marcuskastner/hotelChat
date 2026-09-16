@@ -29,7 +29,7 @@ class HotelSearchValidatorTest extends KernelTestCase
             adults: 2,
             children: 1,
             rooms: 1,
-            amenities: ['pool'],
+            amenities: ['swimming_pool'],
         );
 
         $this->validator->validate($search);
@@ -188,7 +188,7 @@ class HotelSearchValidatorTest extends KernelTestCase
             state: 'CA',
             adults: 2,
             rooms: 1,
-            amenities: ['pool', 'wifi'],
+            amenities: ['swimming_pool', 'wifi'],
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -206,7 +206,7 @@ class HotelSearchValidatorTest extends KernelTestCase
             adults: 2,
             rooms: 1,
             amenities: [
-                'pool',
+                'swimming_pool',
                 'wifi',
                 'gym',
             ],
@@ -215,5 +215,22 @@ class HotelSearchValidatorTest extends KernelTestCase
         $this->validator->validate($search);
 
         self::assertTrue(true);
+    }
+
+    public function testAmenityMustBeAnExpediaCategory(): void
+    {
+        $search = new HotelSearch(
+            city: 'San Diego',
+            state: 'CA',
+            checkIn: '2026-09-15',
+            checkOut: '2026-09-17',
+            adults: 2,
+            rooms: 1,
+            amenities: ['pool'],
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->validator->validate($search);
     }
 }

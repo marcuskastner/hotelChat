@@ -4,6 +4,7 @@ namespace App\Tests\Action;
 
 use App\Action\HotelSearchFromChatAction;
 use App\Entity\HotelSearch;
+use App\Service\OpenAiService;
 use InvalidArgumentException;
 use Symfony\AI\Agent\AgentInterface;
 use Symfony\AI\Agent\MockAgent;
@@ -22,7 +23,7 @@ class HotelSearchFromChatActionTest extends KernelTestCase
             'adults' => 1,
             'children' => 0,
             'rooms' => 1,
-            'amenities' => ['pool'],
+            'amenities' => ['swimming_pool'],
         ]);
 
         $search = $this->action($agent)->getHotelSearch($message);
@@ -35,8 +36,8 @@ class HotelSearchFromChatActionTest extends KernelTestCase
         self::assertSame(1, $search->adults);
         self::assertSame(0, $search->children);
         self::assertSame(1, $search->rooms);
-        self::assertSame(['pool'], $search->amenities);
-        $agent->assertCalledWith($message);
+        self::assertSame(['swimming_pool'], $search->amenities);
+        $agent->assertCalledWith($this->llmMessage($message));
         $agent->assertCallCount(1);
     }
 
@@ -73,7 +74,7 @@ class HotelSearchFromChatActionTest extends KernelTestCase
         self::assertSame('2026-09-17', $search->checkOut);
         self::assertSame(2, $search->adults);
         self::assertSame(1, $search->rooms);
-        self::assertSame(['pool'], $search->amenities);
+        self::assertSame(['swimming_pool'], $search->amenities);
         $agent->assertCallCount(0);
     }
 
@@ -83,8 +84,15 @@ class HotelSearchFromChatActionTest extends KernelTestCase
     private function mockAgent(string $message, array $payload): MockAgent
     {
         return new MockAgent([
-            $message => json_encode($payload, \JSON_THROW_ON_ERROR),
+            $this->llmMessage($message) => json_encode($payload, \JSON_THROW_ON_ERROR),
         ]);
+    }
+
+    private function llmMessage(string $message): string
+    {
+        self::bootKernel();
+
+        return static::getContainer()->get(OpenAiService::class)->prefixedMessage($message);
     }
 
     private function action(MockAgent $agent): HotelSearchFromChatAction

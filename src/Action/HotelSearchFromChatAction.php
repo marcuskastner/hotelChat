@@ -24,7 +24,7 @@ class HotelSearchFromChatAction
                 checkOut: '2026-09-17',
                 adults: 2,
                 rooms: 1,
-                amenities: ['pool'],
+                amenities: ['swimming_pool'],
             );
         } else {
             $search = $this->parser->parse($message);

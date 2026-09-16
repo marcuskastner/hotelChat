@@ -49,6 +49,11 @@ class HotelMapper
         return $hotel;
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $amenities
+     *
+     * @return list<string>
+     */
     private function mapAmenities(array $amenities): array
     {
         $categories = [];
@@ -61,5 +66,4 @@ class HotelMapper
 
         return array_values(array_unique($categories));
     }
-
 }

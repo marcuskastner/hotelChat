@@ -38,6 +38,19 @@ class HotelSearch
         ])]
         public array $amenities = [],
 
+        /**
+         * Relative ranking importance. Keys: rating, price, location, amenity.
+         * Values: NA, LOW, MEDIUM, HIGH.
+         *
+         * @var array<string, string>
+         */
+        public array $rankingWeights = [
+            'rating' => RankingImportance::MEDIUM,
+            'price' => RankingImportance::MEDIUM,
+            'location' => RankingImportance::MEDIUM,
+            'amenity' => RankingImportance::MEDIUM,
+        ],
+
         public ?float $latitude = null,
         public ?float $longitude = null
     ){
@@ -124,6 +137,22 @@ class HotelSearch
         $this->amenities = $amenities;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function getRankingWeights(): array
+    {
+        return $this->rankingWeights;
+    }
+
+    /**
+     * @param array<string, string> $rankingWeights
+     */
+    public function setRankingWeights(array $rankingWeights): void
+    {
+        $this->rankingWeights = $rankingWeights;
+    }
+
     public function getLatitude(): ?float
     {
         return $this->latitude;
@@ -142,5 +171,27 @@ class HotelSearch
     public function setLongitude(?float $longitude): void
     {
         $this->longitude = $longitude;
+    }
+
+    public function distanceInMiles(?float $latitude, ?float $longitude): ?float
+    {
+        if (
+            $this->latitude === null
+            || $this->longitude === null
+            || $latitude === null
+            || $longitude === null
+        ) {
+            return null;
+        }
+
+        $toRad = static fn (float $deg): float => $deg * M_PI / 180;
+        $dLat = $toRad($latitude - $this->latitude);
+        $dLon = $toRad($longitude - $this->longitude);
+        $a = sin($dLat / 2) ** 2
+            + cos($toRad($this->latitude))
+            * cos($toRad($latitude))
+            * sin($dLon / 2) ** 2;
+
+        return 3958.8 * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 }

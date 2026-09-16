@@ -65,7 +65,7 @@ class HotelChatSearchControllerTest extends WebTestCase
         $contentService = $this->createMock(HotelContentService::class);
         $contentService->expects($this->once())
             ->method('getHotelsContent')
-            ->with($candidates)
+            ->with($search, $candidates)
             ->willReturn($hotels);
         static::getContainer()->set(HotelContentService::class, $contentService);
 

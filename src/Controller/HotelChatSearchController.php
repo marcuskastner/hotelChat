@@ -30,7 +30,7 @@ class HotelChatSearchController extends AbstractController
 
             $search = $hotelSearchFromChatAction->getHotelSearch($message);
             $candidates = $hotelCandidatesFromChatSearchAction->getHotelCandidates($search);
-            $hotels = $hotelContentService->getHotelsContent($candidates);
+            $hotels = $hotelContentService->getHotelsContent($search, $candidates);
             $rankedHotels = $hotelRankerService->rank($search, $hotels);
         } catch (\Throwable $e) {
             return $this->render('hotel_chat/alert.html.twig', [
