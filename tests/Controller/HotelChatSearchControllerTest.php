@@ -2,7 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Action\HotelChatSearchAction;
+use App\Action\HotelCandidatesFromChatSearchAction;
+use App\Entity\HotelCandidate;
 use App\Entity\HotelSearch;
 use App\Tests\WebTestCase;
 
@@ -29,25 +30,17 @@ class HotelChatSearchControllerTest extends WebTestCase
         $client = static::createClient();
 
         $message = 'Find me a hotel in Portland';
-        $search = new HotelSearch(
-            city: 'Portland',
-            state: 'OR',
-            checkIn: '2026-09-15',
-            checkOut: '2026-09-17',
-            adults: 1,
-            children: 0,
-            rooms: 1,
-            amenities: [],
-            latitude: 45.5234515,
-            longitude: -122.6762071,
-        );
 
-        $action = $this->createMock(HotelChatSearchAction::class);
+        $return = [
+            new HotelCandidate()
+        ];
+
+        $action = $this->createMock(HotelCandidatesFromChatSearchAction::class);
         $action->expects($this->once())
-            ->method('execute')
+            ->method('getHotelCandidates')
             ->with($message)
-            ->willReturn($search);
-        static::getContainer()->set(HotelChatSearchAction::class, $action);
+            ->willReturn($return);
+        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $action);
 
         $client->request('POST', '/hotel/chat/search', [
             'message' => $message,
@@ -70,11 +63,11 @@ class HotelChatSearchControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $action = $this->createMock(HotelChatSearchAction::class);
+        $action = $this->createMock(HotelCandidatesFromChatSearchAction::class);
         $action->expects($this->once())
-            ->method('execute')
+            ->method('getHotelCandidates')
             ->willThrowException(new \InvalidArgumentException('Location not found for city: Nowhere, state: OR'));
-        static::getContainer()->set(HotelChatSearchAction::class, $action);
+        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $action);
 
         $client->request('POST', '/hotel/chat/search', [
             'message' => 'Find me a hotel in Nowhere',

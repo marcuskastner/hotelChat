@@ -11,8 +11,9 @@ class ContentServiceClient
 
     public function __construct(
         HttpClientInterface $client,
-        string $baseUrl
-    ) {
+        string              $baseUrl
+    )
+    {
         $this->client = $client;
         $this->baseUrl = $baseUrl;
     }
@@ -25,6 +26,23 @@ class ContentServiceClient
             $this->baseUrl . '/hotel/expedia/geography',
             [
                 'json' => $data,
+            ]
+        );
+
+        return $response->toArray();
+    }
+
+    public function getPropertiesContent(array $propertyIds, array $include): array
+    {
+
+        $response = $this->client->request(
+            'GET',
+            $this->baseUrl . '/hotel/expedia/content',
+            [
+                'query' => [
+                    'properties' => implode(',', $propertyIds),
+                    'include' => implode(',', $include),
+                ],
             ]
         );
 

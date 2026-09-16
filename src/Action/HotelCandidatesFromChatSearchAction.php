@@ -11,7 +11,7 @@ use App\Service\HotelSearchParser;
 use App\Service\HotelSearchValidator;
 use App\Service\CoordinatePolygonService;
 
-class HotelChatSearchAction
+class HotelCandidatesFromChatSearchAction
 {
     private HotelSearchParser $parser;
     private HotelSearchValidator $validator;
@@ -39,7 +39,7 @@ class HotelChatSearchAction
         $this->hotelToChannelSourceRepository = $hotelToChannelSourceRepository;
     }
 
-    public function execute(string $message): HotelSearch
+    public function getHotelCandidates(string $message): array
     {
         if($message === 'test') {
             $search = new HotelSearch(
@@ -66,10 +66,8 @@ class HotelChatSearchAction
         $candidates = array_map([$this->hotelCandidateMapper, 'map'], $data['result']);
         $this->hotelToChannelSourceRepository->decorateAresHotelIds($candidates);
 
-        $candidates = array_filter($candidates, function ($candidate) {
+        return array_filter($candidates, function ($candidate) {
             return $candidate->getAresHotelId() !== null;
         });
-
-        return $search;
     }
 }
