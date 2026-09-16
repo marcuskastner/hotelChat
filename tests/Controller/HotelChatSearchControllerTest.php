@@ -3,8 +3,11 @@
 namespace App\Tests\Controller;
 
 use App\Action\HotelCandidatesFromChatSearchAction;
+use App\Action\HotelSearchFromChatAction;
+use App\Entity\Hotel;
 use App\Entity\HotelCandidate;
 use App\Entity\HotelSearch;
+use App\Service\HotelContentService;
 use App\Tests\WebTestCase;
 
 class HotelChatSearchControllerTest extends WebTestCase
@@ -30,17 +33,41 @@ class HotelChatSearchControllerTest extends WebTestCase
         $client = static::createClient();
 
         $message = 'Find me a hotel in Portland';
-
-        $return = [
-            new HotelCandidate()
+        $search = new HotelSearch(
+            city: 'Portland',
+            state: 'OR',
+            checkIn: '2026-09-15',
+            checkOut: '2026-09-17',
+            adults: 1,
+            rooms: 1,
+        );
+        $candidates = [
+            new HotelCandidate(),
+        ];
+        $hotels = [
+            new Hotel(),
         ];
 
-        $action = $this->createMock(HotelCandidatesFromChatSearchAction::class);
-        $action->expects($this->once())
-            ->method('getHotelCandidates')
+        $searchAction = $this->createMock(HotelSearchFromChatAction::class);
+        $searchAction->expects($this->once())
+            ->method('getHotelSearch')
             ->with($message)
-            ->willReturn($return);
-        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $action);
+            ->willReturn($search);
+        static::getContainer()->set(HotelSearchFromChatAction::class, $searchAction);
+
+        $candidatesAction = $this->createMock(HotelCandidatesFromChatSearchAction::class);
+        $candidatesAction->expects($this->once())
+            ->method('getHotelCandidates')
+            ->with($search)
+            ->willReturn($candidates);
+        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $candidatesAction);
+
+        $contentService = $this->createMock(HotelContentService::class);
+        $contentService->expects($this->once())
+            ->method('getHotelsContent')
+            ->with($candidates)
+            ->willReturn($hotels);
+        static::getContainer()->set(HotelContentService::class, $contentService);
 
         $client->request('POST', '/hotel/chat/search', [
             'message' => $message,
@@ -63,11 +90,27 @@ class HotelChatSearchControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $action = $this->createMock(HotelCandidatesFromChatSearchAction::class);
-        $action->expects($this->once())
+        $search = new HotelSearch(
+            city: 'Nowhere',
+            state: 'OR',
+            checkIn: '2026-09-15',
+            checkOut: '2026-09-17',
+            adults: 1,
+            rooms: 1,
+        );
+
+        $searchAction = $this->createMock(HotelSearchFromChatAction::class);
+        $searchAction->expects($this->once())
+            ->method('getHotelSearch')
+            ->willReturn($search);
+        static::getContainer()->set(HotelSearchFromChatAction::class, $searchAction);
+
+        $candidatesAction = $this->createMock(HotelCandidatesFromChatSearchAction::class);
+        $candidatesAction->expects($this->once())
             ->method('getHotelCandidates')
+            ->with($search)
             ->willThrowException(new \InvalidArgumentException('Location not found for city: Nowhere, state: OR'));
-        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $action);
+        static::getContainer()->set(HotelCandidatesFromChatSearchAction::class, $candidatesAction);
 
         $client->request('POST', '/hotel/chat/search', [
             'message' => 'Find me a hotel in Nowhere',

@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Action\HotelCandidatesFromChatSearchAction;
+use App\Action\HotelSearchFromChatAction;
 use App\Service\HotelContentService;
+use App\Service\HotelRankerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,8 +16,10 @@ class HotelChatSearchController extends AbstractController
     #[Route('/hotel/chat/search', name: 'hotel_chat_search', methods: ['POST'])]
     public function search(
         Request $request,
+        HotelSearchFromChatAction $hotelSearchFromChatAction,
         HotelCandidatesFromChatSearchAction $hotelCandidatesFromChatSearchAction,
         HotelContentService $hotelContentService,
+        HotelRankerService $hotelRankerService,
     ): Response {
         try {
             $message = $request->request->get('message');
@@ -24,9 +28,10 @@ class HotelChatSearchController extends AbstractController
                 throw new \InvalidArgumentException('Message is required');
             }
 
-            $candidates = $hotelCandidatesFromChatSearchAction->getHotelCandidates($message);
+            $search = $hotelSearchFromChatAction->getHotelSearch($message);
+            $candidates = $hotelCandidatesFromChatSearchAction->getHotelCandidates($search);
             $hotels = $hotelContentService->getHotelsContent($candidates);
-
+            $rankedHotels = $hotelRankerService->rank($search, $hotels);
         } catch (\Throwable $e) {
             return $this->render('hotel_chat/alert.html.twig', [
                 'alert' => $e->getMessage(),
@@ -35,7 +40,8 @@ class HotelChatSearchController extends AbstractController
 
         return $this->render('hotel_chat/response.html.twig', [
             'message' => $message,
-            'search' => '',
+            'search' => $search,
+            'hotels' => $rankedHotels,
         ]);
     }
 }
